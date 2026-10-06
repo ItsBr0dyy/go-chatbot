@@ -5,7 +5,8 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
+
+	"github.com/gempir/go-twitch-irc/v4"
 
 	"github.com/itsbr0dyy/go-chatbot/commands"
 	"github.com/itsbr0dyy/go-chatbot/config"
@@ -41,59 +42,37 @@ func main() {
 		log.Fatalf("loading helpers: %v", err)
 	}
 
-	for {
-		if err := run(cfg, channels, links, helpers); err != nil {
-			log.Printf("disconnected: %v", err)
+	client := utils.NewClient(cfg.Username, cfg.OAuth)
+	irc := client.IRC()
+
+	irc.OnConnect(func() {
+		log.Println("connected to Twitch")
+	})
+
+	irc.OnNoticeMessage(func(m twitch.NoticeMessage) {
+		log.Printf("NOTICE #%s: %s", m.Channel, m.Message)
+	})
+
+	irc.OnPrivateMessage(func(m twitch.PrivateMessage) {
+		msg := &utils.Message{
+			Tags:    m.Tags,
+			User:    m.User.Name,
+			Channel: m.Channel,
+			Text:    m.Message,
 		}
-		log.Println("reconnecting in 5s...")
-		time.Sleep(5 * time.Second)
-	}
-}
-
-func run(cfg *config.Config, channels *config.Channels, links *config.Links, helpers *config.Helpers) error {
-	client, err := utils.Dial()
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
-	if err := client.Login(cfg.Username, cfg.OAuth); err != nil {
-		return err
-	}
+		go commands.Handle(client, msg, cfg, channels, links, helpers)
+	})
 
 	list, err := channels.List()
 	if err != nil {
-		return err
+		log.Fatalf("listing channels: %v", err)
 	}
 	for _, ch := range list {
-		if err := client.Join(ch); err != nil {
-			return err
-		}
+		client.Join(ch)
 	}
 	log.Printf("connecting as %s, joining %s", cfg.Username, strings.Join(list, ", "))
 
-	for {
-		line, err := client.ReadLine()
-		if err != nil {
-			return err
-		}
-
-		msg := utils.ParseMessage(line)
-		switch msg.Command {
-		case "001":
-			log.Println("authenticated OK")
-		case "PING":
-			client.Send("PONG :tmi.twitch.tv")
-		case "PONG":
-			utils.HandlePong(msg.Text)
-		case "PRIVMSG":
-			go commands.Handle(client, msg, cfg, channels, links, helpers)
-		case "NOTICE":
-			log.Printf("NOTICE: %s", msg.Text)
-			if strings.Contains(msg.Text, "authentication failed") ||
-				strings.Contains(msg.Text, "improperly formatted auth") {
-				log.Fatal("bad token or username")
-			}
-		}
+	if err := client.Connect(); err != nil {
+		log.Fatal(err)
 	}
 }
