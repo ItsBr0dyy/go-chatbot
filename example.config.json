@@ -1,0 +1,13 @@
+{
+  "username": "",
+  "oauth": "oauth:token",
+  "owners": [""],
+  "helpers": [],
+  "prefix": "",
+  "lastfm_api_key": "",
+  "db_host": "",
+  "db_port": "",
+  "db_user": "",
+  "db_password": "",
+  "db_name": ""
+}
