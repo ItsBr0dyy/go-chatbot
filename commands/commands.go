@@ -40,9 +40,7 @@ type Context struct {
 func (c *Context) Reply(text string) {
 	if err := c.Client.SayReply(c.Msg.Channel, c.Msg.Tags["id"], text); err != nil {
 		log.Printf("reply failed: %v", err)
-		return
 	}
-	log.Printf("-> #%s: %s", c.Msg.Channel, text)
 }
 
 func (c *Context) IsOwner() bool {
@@ -112,7 +110,6 @@ func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channe
 		}
 	}
 
-	log.Printf("command %q from %s in #%s", fields[0], msg.User, msg.Channel)
 	utils.CountCommand()
 	cmd.Run(ctx)
 }

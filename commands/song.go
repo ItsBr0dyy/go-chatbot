@@ -36,7 +36,7 @@ func song(ctx *Context) {
 		}
 	}
 
-	lfm, ok := ctx.Links.Get(target)
+	lfm, ok := ctx.Links.Get("lastfm", target)
 	if !ok {
 		if self {
 			ctx.Reply(fmt.Sprintf("You haven't linked a Last.fm account. Use %slink lastfm <username>", ctx.Config.Prefix))
