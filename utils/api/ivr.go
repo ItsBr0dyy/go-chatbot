@@ -12,16 +12,24 @@ import (
 
 var ErrTwitchUserNotFound = errors.New("twitch user not found")
 
+type TwitchBadge struct {
+	SetID       string `json:"setID"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Version     string `json:"version"`
+}
+
 type TwitchUser struct {
-	Banned       bool      `json:"banned"`
-	DisplayName  string    `json:"displayName"`
-	Login        string    `json:"login"`
-	ID           string    `json:"id"`
-	Bio          string    `json:"bio"`
-	Follows      *int      `json:"follows"`
-	Followers    int       `json:"followers"`
-	ChatterCount *int      `json:"chatterCount"`
-	CreatedAt    time.Time `json:"createdAt"`
+	Banned       bool          `json:"banned"`
+	DisplayName  string        `json:"displayName"`
+	Login        string        `json:"login"`
+	ID           string        `json:"id"`
+	Bio          string        `json:"bio"`
+	Follows      *int          `json:"follows"`
+	Followers    int           `json:"followers"`
+	Badges       []TwitchBadge `json:"badges"`
+	ChatterCount *int          `json:"chatterCount"`
+	CreatedAt    time.Time     `json:"createdAt"`
 	Roles        struct {
 		IsPreAffiliate *bool `json:"isPreAffiliate"`
 		IsAffiliate    *bool `json:"isAffiliate"`

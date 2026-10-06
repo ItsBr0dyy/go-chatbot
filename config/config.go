@@ -18,6 +18,7 @@ type Config struct {
 	LastFMKey  string   `json:"lastfm_api_key"`
 	SongEmote  string   `json:"song_emote"`
 	ShortAPI   string   `json:"short_api"`
+	PasteAPI   string   `json:"paste_api"`
 	DBHost     string   `json:"db_host"`
 	DBPort     string   `json:"db_port"`
 	DBUser     string   `json:"db_user"`
@@ -59,6 +60,9 @@ func Load(path string) (*Config, error) {
 	}
 	if cfg.ShortAPI == "" {
 		cfg.ShortAPI = "https://itsbr0dyy.dev/api/redirect"
+	}
+	if cfg.PasteAPI == "" {
+		cfg.PasteAPI = "https://itsbr0dyy.dev/api/haste"
 	}
 	return &cfg, nil
 }

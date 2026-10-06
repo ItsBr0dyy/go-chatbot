@@ -11,11 +11,13 @@ import (
 
 func init() {
 	Register(&Command{
-		Name: "ping",
-		Run:  ping,
+		Name:     "ping",
+		Category: "General",
+		Usage:    "ping",
+		Desc:     "Shows latency, uptime and memory use.",
+		Run:      ping,
 	})
 }
-
 func ping(ctx *Context) {
 	latency := "n/a"
 	if rtt, err := ctx.Client.Ping(); err == nil {

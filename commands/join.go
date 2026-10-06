@@ -10,8 +10,12 @@ var validChannel = regexp.MustCompile(`^[a-z0-9_]{1,25}$`)
 
 func init() {
 	Register(&Command{
-		Name: "join",
-		Run:  join,
+		Name:     "join",
+		Category: "Bot management",
+		Usage:    "join <channel>",
+		Desc:     "Makes the bot join a channel and saves it.",
+		Access:   AccessHelper,
+		Run:      join,
 	})
 }
 

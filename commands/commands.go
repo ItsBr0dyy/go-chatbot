@@ -8,6 +8,25 @@ import (
 	"github.com/itsbr0dyy/go-chatbot/utils"
 )
 
+type Access int
+
+const (
+	AccessEveryone Access = iota
+	AccessHelper
+	AccessOwner
+)
+
+func (a Access) String() string {
+	switch a {
+	case AccessHelper:
+		return "Helper"
+	case AccessOwner:
+		return "Owner"
+	default:
+		return "Everyone"
+	}
+}
+
 type Context struct {
 	Client   *utils.Client
 	Msg      *utils.Message
@@ -39,9 +58,13 @@ func (c *Context) isHelperLogin(login string) bool {
 }
 
 type Command struct {
-	Name    string
-	Aliases []string
-	Run     func(ctx *Context)
+	Name     string
+	Aliases  []string
+	Category string
+	Usage    string
+	Desc     string
+	Access   Access
+	Run      func(ctx *Context)
 }
 
 var registry = map[string]*Command{}
@@ -68,9 +91,7 @@ func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channe
 		return
 	}
 
-	log.Printf("command %q from %s in #%s", fields[0], msg.User, msg.Channel)
-	utils.CountCommand()
-	cmd.Run(&Context{
+	ctx := &Context{
 		Client:   client,
 		Msg:      msg,
 		Args:     fields[1:],
@@ -78,5 +99,20 @@ func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channe
 		Channels: channels,
 		Links:    links,
 		Helpers:  helpers,
-	})
+	}
+
+	switch cmd.Access {
+	case AccessOwner:
+		if !ctx.IsOwner() {
+			return
+		}
+	case AccessHelper:
+		if !ctx.IsHelper() {
+			return
+		}
+	}
+
+	log.Printf("command %q from %s in #%s", fields[0], msg.User, msg.Channel)
+	utils.CountCommand()
+	cmd.Run(ctx)
 }

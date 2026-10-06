@@ -9,9 +9,12 @@ import (
 
 func init() {
 	Register(&Command{
-		Name:    "subage",
-		Aliases: []string{"sa"},
-		Run:     subAge,
+		Name:     "subage",
+		Aliases:  []string{"sa"},
+		Category: "Twitch info",
+		Usage:    "subage [username] [channel]",
+		Desc:     "Shows a user's subscription to a channel.",
+		Run:      subAge,
 	})
 }
 

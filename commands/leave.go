@@ -7,9 +7,13 @@ import (
 
 func init() {
 	Register(&Command{
-		Name:    "leave",
-		Aliases: []string{"part"},
-		Run:     leave,
+		Name:     "leave",
+		Aliases:  []string{"part"},
+		Category: "Bot management",
+		Usage:    "leave [channel]",
+		Desc:     "Makes the bot leave a channel.",
+		Access:   AccessHelper,
+		Run:      leave,
 	})
 }
 

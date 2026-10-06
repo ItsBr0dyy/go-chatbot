@@ -10,8 +10,11 @@ import (
 
 func init() {
 	Register(&Command{
-		Name: "song",
-		Run:  song,
+		Name:     "song",
+		Category: "Music",
+		Usage:    "song [username]",
+		Desc:     "Shows what you or another linked user is listening to.",
+		Run:      song,
 	})
 }
 

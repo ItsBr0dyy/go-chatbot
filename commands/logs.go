@@ -13,8 +13,11 @@ var validLogName = regexp.MustCompile(`^[a-z0-9_]{1,25}$`)
 
 func init() {
 	Register(&Command{
-		Name: "logs",
-		Run:  logs,
+		Name:     "logs",
+		Category: "Twitch info",
+		Usage:    "logs [channel] [user]",
+		Desc:     "Links to a user's chat logs in a channel.",
+		Run:      logs,
 	})
 }
 

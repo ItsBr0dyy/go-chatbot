@@ -13,8 +13,11 @@ var validLastFM = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_-]{1,14}$`)
 
 func init() {
 	Register(&Command{
-		Name: "link",
-		Run:  link,
+		Name:     "link",
+		Category: "Music",
+		Usage:    "link lastfm <username>",
+		Desc:     "Links your Last.fm account to your Twitch name.",
+		Run:      link,
 	})
 }
 

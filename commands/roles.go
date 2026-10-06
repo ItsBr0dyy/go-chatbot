@@ -8,10 +8,26 @@ import (
 )
 
 func init() {
-	Register(&Command{Name: "mods", Run: rolesCommand("moderators", "mods", "a", "moderator")})
-	Register(&Command{Name: "vips", Run: rolesCommand("vips", "vips", "a", "VIP")})
-	Register(&Command{Name: "founders", Run: rolesCommand("founders", "founders", "a", "founder")})
-	Register(&Command{Name: "artists", Run: rolesCommand("artists", "artists", "an", "artist")})
+	Register(&Command{
+		Name: "mods", Category: "Twitch info", Usage: "mods [username]",
+		Desc: "Shows how many channels a user moderates.",
+		Run:  rolesCommand("moderators", "mods", "a", "moderator"),
+	})
+	Register(&Command{
+		Name: "vips", Category: "Twitch info", Usage: "vips [username]",
+		Desc: "Shows how many channels a user is a VIP in.",
+		Run:  rolesCommand("vips", "vips", "a", "VIP"),
+	})
+	Register(&Command{
+		Name: "founders", Category: "Twitch info", Usage: "founders [username]",
+		Desc: "Shows how many channels a user is a founder in.",
+		Run:  rolesCommand("founders", "founders", "a", "founder"),
+	})
+	Register(&Command{
+		Name: "artists", Category: "Twitch info", Usage: "artists [username]",
+		Desc: "Shows how many channels a user is an artist in.",
+		Run:  rolesCommand("artists", "artists", "an", "artist"),
+	})
 }
 
 func rolesCommand(kind, cmd, article, label string) func(ctx *Context) {

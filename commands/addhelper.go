@@ -6,8 +6,12 @@ import (
 
 func init() {
 	Register(&Command{
-		Name: "addhelper",
-		Run:  addHelper,
+		Name:     "addhelper",
+		Category: "Bot management",
+		Usage:    "addhelper <username>",
+		Desc:     "Gives a user helper access.",
+		Access:   AccessOwner,
+		Run:      addHelper,
 	})
 }
 
