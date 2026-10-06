@@ -26,6 +26,18 @@ CREATE TABLE IF NOT EXISTS helpers (
 	added_by TEXT NOT NULL,
 	added_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS account_links (
+	twitch_login TEXT NOT NULL,
+	service      TEXT NOT NULL,
+	username     TEXT NOT NULL,
+	updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+	PRIMARY KEY (twitch_login, service)
+);
+
+INSERT INTO account_links (twitch_login, service, username, updated_at)
+SELECT twitch_login, 'lastfm', lastfm_user, updated_at FROM links
+ON CONFLICT DO NOTHING;
 `
 
 func Connect(ctx context.Context, url string) (*pgxpool.Pool, error) {
