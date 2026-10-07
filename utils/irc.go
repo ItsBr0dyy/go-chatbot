@@ -44,20 +44,3 @@ func (c *Client) SayReply(channel, parentID, text string) error {
 	}
 	return nil
 }
-
-type Message struct {
-	Tags    map[string]string
-	User    string
-	Channel string
-	Text    string
-}
-
-func (m *Message) DisplayName() string {
-	if n := m.Tags["display-name"]; n != "" {
-		return n
-	}
-	return m.User
-}
-
-func (m *Message) UserID() string    { return m.Tags["user-id"] }
-func (m *Message) ChannelID() string { return m.Tags["room-id"] }
