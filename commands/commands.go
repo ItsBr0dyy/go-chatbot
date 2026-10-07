@@ -75,11 +75,12 @@ func Register(cmd *Command) {
 }
 
 func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channels *config.Channels, links *config.Links, helpers *config.Helpers) {
-	if !strings.HasPrefix(msg.Text, cfg.Prefix) {
+	body, ok := commandText(msg.Text, cfg)
+	if !ok {
 		return
 	}
 
-	fields := strings.Fields(strings.TrimPrefix(msg.Text, cfg.Prefix))
+	fields := strings.Fields(body)
 	if len(fields) == 0 {
 		return
 	}
@@ -112,4 +113,19 @@ func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channe
 
 	utils.CountCommand()
 	cmd.Run(ctx)
+}
+
+func commandText(text string, cfg *config.Config) (string, bool) {
+	if strings.HasPrefix(text, cfg.Prefix) {
+		return strings.TrimPrefix(text, cfg.Prefix), true
+	}
+
+	mention := "@" + cfg.Username
+	if len(text) < len(mention) || !strings.EqualFold(text[:len(mention)], mention) {
+		return "", false
+	}
+
+	rest := strings.TrimLeft(text[len(mention):], " ,:")
+	rest = strings.TrimPrefix(rest, cfg.Prefix)
+	return rest, true
 }
