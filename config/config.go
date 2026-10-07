@@ -10,20 +10,21 @@ import (
 )
 
 type Config struct {
-	Username   string   `json:"username"`
-	OAuth      string   `json:"oauth"`
-	Helpers    []string `json:"helpers"`
-	Owners     []string `json:"owners"`
-	Prefix     string   `json:"prefix"`
-	LastFMKey  string   `json:"lastfm_api_key"`
-	SongEmote  string   `json:"song_emote"`
-	ShortAPI   string   `json:"short_api"`
-	PasteAPI   string   `json:"paste_api"`
-	DBHost     string   `json:"db_host"`
-	DBPort     string   `json:"db_port"`
-	DBUser     string   `json:"db_user"`
-	DBPassword string   `json:"db_password"`
-	DBName     string   `json:"db_name"`
+	Username     string   `json:"username"`
+	OAuth        string   `json:"oauth"`
+	Helpers      []string `json:"helpers"`
+	Owners       []string `json:"owners"`
+	Prefix       string   `json:"prefix"`
+	LastFMKey    string   `json:"lastfm_api_key"`
+	SevenTVToken string   `json:"seventv_token"`
+	SongEmote    string   `json:"song_emote"`
+	ShortAPI     string   `json:"short_api"`
+	PasteAPI     string   `json:"paste_api"`
+	DBHost       string   `json:"db_host"`
+	DBPort       string   `json:"db_port"`
+	DBUser       string   `json:"db_user"`
+	DBPassword   string   `json:"db_password"`
+	DBName       string   `json:"db_name"`
 }
 
 func Load(path string) (*Config, error) {

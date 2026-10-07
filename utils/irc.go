@@ -58,3 +58,6 @@ func (m *Message) DisplayName() string {
 	}
 	return m.User
 }
+
+func (m *Message) UserID() string    { return m.Tags["user-id"] }
+func (m *Message) ChannelID() string { return m.Tags["room-id"] }

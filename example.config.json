@@ -5,6 +5,7 @@
   "helpers": [],
   "prefix": "",
   "lastfm_api_key": "",
+  "seventv_token": "",
   "db_host": "",
   "db_port": "",
   "db_user": "",
