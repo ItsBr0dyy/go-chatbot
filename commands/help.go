@@ -21,13 +21,18 @@ func init() {
 		Name:     "commands",
 		Aliases:  []string{"cmds", "help"},
 		Category: "General",
-		Usage:    "commands",
-		Desc:     "Links to this list.",
+		Usage:    "help [command]",
+		Desc:     "Links to the command list, or shows info about one command.",
 		Run:      help,
 	})
 }
 
 func help(ctx *Context) {
+	if len(ctx.Args) > 0 {
+		commandInfo(ctx, ctx.Args[0])
+		return
+	}
+
 	helpMu.Lock()
 	defer helpMu.Unlock()
 
@@ -49,6 +54,37 @@ func help(ctx *Context) {
 
 	helpLink = link
 	ctx.Reply("All commands: " + link)
+}
+
+func commandInfo(ctx *Context, arg string) {
+	prefix := ctx.Config.Prefix
+	name := strings.ToLower(strings.TrimPrefix(arg, prefix))
+
+	c, ok := registry[name]
+	if !ok {
+		ctx.Reply(fmt.Sprintf("No command named %q. Use %shelp for the full list.", name, prefix))
+		return
+	}
+
+	usage := c.Usage
+	if usage == "" {
+		usage = c.Name
+	}
+
+	parts := []string{fmt.Sprintf("%s%s", prefix, usage)}
+	if c.Desc != "" {
+		parts = append(parts, c.Desc)
+	}
+	if len(c.Aliases) > 0 {
+		aliases := make([]string, len(c.Aliases))
+		for i, a := range c.Aliases {
+			aliases[i] = prefix + a
+		}
+		parts = append(parts, "Aliases: "+strings.Join(aliases, ", "))
+	}
+	parts = append(parts, fmt.Sprintf("Access: %s", c.Access))
+
+	ctx.Reply(strings.Join(parts, " | "))
 }
 
 func categoryRank(cat string) int {
