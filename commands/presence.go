@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	utils "github.com/itsbr0dyy/go-chatbot/utils/api"
+	utils "github.com/itsbr0dyy/go-chatbot/utils"
 	"github.com/itsbr0dyy/go-chatbot/utils/api/stv"
 )
 
@@ -46,7 +46,7 @@ func presence(ctx *Context) {
 		return
 	}
 
-	if err := stv.SendPresence(ctx.Config.SevenTVToken, stvID, ctx.Msg.ChannelID()); err != nil {
+	if err := stv.SendPresence(ctx.Config.STVToken, stvID, ctx.Msg.ChannelID()); err != nil {
 		ctx.Reply(fmt.Sprintf("Couldn't send presence: %v", err))
 		return
 	}

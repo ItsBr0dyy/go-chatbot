@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	utils "github.com/itsbr0dyy/go-chatbot/utils/api"
+	utils "github.com/itsbr0dyy/go-chatbot/utils"
 )
 
 var validLogName = regexp.MustCompile(`^[a-z0-9_]{1,25}$`)

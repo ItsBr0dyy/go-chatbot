@@ -90,34 +90,3 @@ func IVRUser(login string) (*TwitchUser, error) {
 	}
 	return &users[0], nil
 }
-
-func FormatAgo(since time.Time) string {
-	d := time.Since(since)
-	if d < 0 {
-		d = 0
-	}
-
-	days := int(d.Hours() / 24)
-	units := []struct {
-		n    int
-		name string
-	}{
-		{days / 365, "y"},
-		{(days % 365) / 30, "mo"},
-		{(days % 365) % 30, "d"},
-		{int(d.Hours()) % 24, "h"},
-		{int(d.Minutes()) % 60, "m"},
-	}
-
-	for i, u := range units {
-		if u.n == 0 {
-			continue
-		}
-		out := fmt.Sprintf("%d%s", u.n, u.name)
-		if i+1 < len(units) && units[i+1].n > 0 {
-			out += fmt.Sprintf(" %d%s", units[i+1].n, units[i+1].name)
-		}
-		return out
-	}
-	return "<1m"
-}

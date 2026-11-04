@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	utils "github.com/itsbr0dyy/go-chatbot/utils/api"
+	utils "github.com/itsbr0dyy/go-chatbot/utils"
 )
 
 var (

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/gempir/go-twitch-irc/v4"
 
@@ -42,11 +43,18 @@ func main() {
 		log.Fatalf("loading helpers: %v", err)
 	}
 
+	reminders, err := config.LoadReminders(pool)
+	if err != nil {
+		log.Fatalf("loading reminders: %v", err)
+	}
+
 	client := utils.NewClient(cfg.Username, cfg.OAuth)
 	irc := client.IRC()
 
+	var startReminders sync.Once
 	irc.OnConnect(func() {
 		log.Println("connected to Twitch")
+		startReminders.Do(func() { commands.StartReminderLoop(client, reminders) })
 	})
 
 	irc.OnNoticeMessage(func(m twitch.NoticeMessage) {
@@ -54,13 +62,9 @@ func main() {
 	})
 
 	irc.OnPrivateMessage(func(m twitch.PrivateMessage) {
-		msg := &utils.Message{
-			Tags:    m.Tags,
-			User:    m.User.Name,
-			Channel: m.Channel,
-			Text:    m.Message,
-		}
-		go commands.Handle(client, msg, cfg, channels, links, helpers)
+		msg := utils.NewMessage(m)
+		go commands.DeliverReminders(client, msg, reminders)
+		go commands.Handle(client, msg, cfg, channels, links, helpers, reminders)
 	})
 
 	list, err := channels.List()

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	utils "github.com/itsbr0dyy/go-chatbot/utils/api"
+	utils "github.com/itsbr0dyy/go-chatbot/utils"
 )
 
 func init() {

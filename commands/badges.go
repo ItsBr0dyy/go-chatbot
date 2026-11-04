@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	utils "github.com/itsbr0dyy/go-chatbot/utils/api"
+	utils "github.com/itsbr0dyy/go-chatbot/utils"
 )
 
 var excludedBadgeIDs = map[string]bool{

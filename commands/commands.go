@@ -28,13 +28,14 @@ func (a Access) String() string {
 }
 
 type Context struct {
-	Client   *utils.Client
-	Msg      *utils.Message
-	Args     []string
-	Config   *config.Config
-	Channels *config.Channels
-	Links    *config.Links
-	Helpers  *config.Helpers
+	Client    *utils.Client
+	Msg       *utils.Message
+	Args      []string
+	Config    *config.Config
+	Channels  *config.Channels
+	Links     *config.Links
+	Helpers   *config.Helpers
+	Reminders *config.Reminders
 }
 
 func (c *Context) Reply(text string) {
@@ -74,7 +75,7 @@ func Register(cmd *Command) {
 	}
 }
 
-func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channels *config.Channels, links *config.Links, helpers *config.Helpers) {
+func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channels *config.Channels, links *config.Links, helpers *config.Helpers, reminders *config.Reminders) {
 	body, ok := commandText(msg.Text, cfg)
 	if !ok {
 		return
@@ -91,13 +92,14 @@ func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channe
 	}
 
 	ctx := &Context{
-		Client:   client,
-		Msg:      msg,
-		Args:     fields[1:],
-		Config:   cfg,
-		Channels: channels,
-		Links:    links,
-		Helpers:  helpers,
+		Client:    client,
+		Msg:       msg,
+		Args:      fields[1:],
+		Config:    cfg,
+		Channels:  channels,
+		Links:     links,
+		Helpers:   helpers,
+		Reminders: reminders,
 	}
 
 	switch cmd.Access {

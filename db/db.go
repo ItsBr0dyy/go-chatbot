@@ -35,6 +35,19 @@ CREATE TABLE IF NOT EXISTS account_links (
 	PRIMARY KEY (twitch_login, service)
 );
 
+CREATE TABLE IF NOT EXISTS reminders (
+	id           BIGSERIAL PRIMARY KEY,
+	target_login TEXT NOT NULL,
+	author_login TEXT NOT NULL,
+	channel      TEXT NOT NULL,
+	message      TEXT NOT NULL,
+	remind_at    TIMESTAMPTZ,
+	created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS reminders_target_idx ON reminders (target_login);
+CREATE INDEX IF NOT EXISTS reminders_due_idx ON reminders (remind_at) WHERE remind_at IS NOT NULL;
+
 INSERT INTO account_links (twitch_login, service, username, updated_at)
 SELECT twitch_login, 'lastfm', lastfm_user, updated_at FROM links
 ON CONFLICT DO NOTHING;

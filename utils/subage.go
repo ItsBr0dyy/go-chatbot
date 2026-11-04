@@ -152,36 +152,3 @@ func (s *SubAge) Remaining() (time.Duration, bool, bool) {
 	}
 	return 0, false, false
 }
-
-func FormatLong(d time.Duration) string {
-	if d < time.Minute {
-		return "less than a minute"
-	}
-
-	days := int(d.Hours()) / 24
-	hours := int(d.Hours()) % 24
-	mins := int(d.Minutes()) % 60
-
-	var parts []string
-	add := func(n int, unit string) {
-		if n == 0 {
-			return
-		}
-		if n != 1 {
-			unit += "s"
-		}
-		parts = append(parts, fmt.Sprintf("%d %s", n, unit))
-	}
-	add(days, "day")
-	add(hours, "hour")
-	add(mins, "minute")
-
-	switch len(parts) {
-	case 1:
-		return parts[0]
-	case 2:
-		return parts[0] + " and " + parts[1]
-	default:
-		return strings.Join(parts[:len(parts)-1], ", ") + ", and " + parts[len(parts)-1]
-	}
-}

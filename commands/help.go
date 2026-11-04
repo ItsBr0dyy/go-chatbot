@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	utils "github.com/itsbr0dyy/go-chatbot/utils/api"
+	utils "github.com/itsbr0dyy/go-chatbot/utils"
 )
 
 var categoryOrder = []string{"General", "Music", "Twitch info", "Bot management"}
