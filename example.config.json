@@ -5,6 +5,7 @@
   "helpers": [],
   "prefix": "",
   "lastfm_api_key": "",
+  "stv_user_id": "YOUR_7TV_USER_ID",
   "stv_token": "your_7tv_token",
   "db_host": "",
   "db_port": "",

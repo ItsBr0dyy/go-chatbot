@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -289,4 +290,67 @@ mutation UpdateEmoteAlias($setID: Id!, $emoteID: EmoteSetEmoteId!, $alias: Strin
 		"alias":   alias,
 	}
 	return c.do(query, vars, nil)
+}
+
+var ulidPattern = regexp.MustCompile(`^[0-9A-Za-z]{26}$`)
+
+func (c *Client) PendingEditorRequests(userID string) ([]string, error) {
+	if !ulidPattern.MatchString(userID) {
+		return nil, errors.New("invalid 7tv user id")
+	}
+
+	query := fmt.Sprintf(`
+query EditorCheck {
+  users {
+    user(id: %q) {
+      editorFor {
+        state
+        userId
+      }
+    }
+  }
+}`, userID)
+
+	var out struct {
+		Users struct {
+			User *struct {
+				EditorFor []struct {
+					State  string `json:"state"`
+					UserID string `json:"userId"`
+				} `json:"editorFor"`
+			} `json:"user"`
+		} `json:"users"`
+	}
+	if err := c.do(query, map[string]any{}, &out); err != nil {
+		return nil, err
+	}
+
+	var pending []string
+	if out.Users.User != nil {
+		for _, e := range out.Users.User.EditorFor {
+			if e.State == "PENDING" {
+				pending = append(pending, e.UserID)
+			}
+		}
+	}
+	return pending, nil
+}
+
+func (c *Client) AcceptEditorRequest(userID, requesterID string) error {
+	if !ulidPattern.MatchString(userID) || !ulidPattern.MatchString(requesterID) {
+		return errors.New("invalid 7tv user id")
+	}
+
+	query := fmt.Sprintf(`
+mutation AcceptEditor {
+  userEditors {
+    editor(editorId: %q, userId: %q) {
+      updateState(state: ACCEPT) {
+        state
+      }
+    }
+  }
+}`, userID, requesterID)
+
+	return c.do(query, map[string]any{}, nil)
 }
