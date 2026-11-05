@@ -39,7 +39,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("loading channels: %v", err)
 	}
-	links := config.LoadLinks(pool)
 
 	helpers, err := config.LoadHelpers(pool)
 	if err != nil {
@@ -49,6 +48,15 @@ func main() {
 	reminders, err := config.LoadReminders(pool)
 	if err != nil {
 		log.Fatalf("loading reminders: %v", err)
+	}
+
+	deps := &commands.Deps{
+		Config:    cfg,
+		Channels:  channels,
+		Links:     config.LoadLinks(pool),
+		Helpers:   helpers,
+		Reminders: reminders,
+		Cats:      config.LoadCats(pool),
 	}
 
 	client := utils.NewClient(cfg.Username, cfg.OAuth)
@@ -67,7 +75,7 @@ func main() {
 	irc.OnPrivateMessage(func(m twitch.PrivateMessage) {
 		msg := utils.NewMessage(m)
 		go commands.DeliverReminders(client, msg, reminders)
-		go commands.Handle(client, msg, cfg, channels, links, helpers, reminders)
+		go commands.Handle(client, msg, deps)
 	})
 
 	list, err := channels.List()

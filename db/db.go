@@ -51,6 +51,17 @@ CREATE INDEX IF NOT EXISTS reminders_due_idx ON reminders (remind_at) WHERE remi
 INSERT INTO account_links (twitch_login, service, username, updated_at)
 SELECT twitch_login, 'lastfm', lastfm_user, updated_at FROM links
 ON CONFLICT DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS cats (
+	user_id    TEXT PRIMARY KEY,
+	login      TEXT NOT NULL,
+	amount     BIGINT NOT NULL DEFAULT 0 CHECK (amount >= 0),
+	last_catch TIMESTAMPTZ,
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS cats_amount_idx ON cats (amount DESC);
+CREATE INDEX IF NOT EXISTS cats_login_idx ON cats (login);
 `
 
 func Connect(ctx context.Context, url string) (*pgxpool.Pool, error) {

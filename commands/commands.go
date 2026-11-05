@@ -27,6 +27,15 @@ func (a Access) String() string {
 	}
 }
 
+type Deps struct {
+	Config    *config.Config
+	Channels  *config.Channels
+	Links     *config.Links
+	Helpers   *config.Helpers
+	Reminders *config.Reminders
+	Cats      *config.CatStore
+}
+
 type Context struct {
 	Client    *utils.Client
 	Msg       *utils.Message
@@ -36,6 +45,7 @@ type Context struct {
 	Links     *config.Links
 	Helpers   *config.Helpers
 	Reminders *config.Reminders
+	Cats      *config.CatStore
 }
 
 func (c *Context) Reply(text string) {
@@ -75,8 +85,8 @@ func Register(cmd *Command) {
 	}
 }
 
-func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channels *config.Channels, links *config.Links, helpers *config.Helpers, reminders *config.Reminders) {
-	body, ok := commandText(msg.Text, cfg)
+func Handle(client *utils.Client, msg *utils.Message, d *Deps) {
+	body, ok := commandText(msg.Text, d.Config)
 	if !ok {
 		return
 	}
@@ -95,11 +105,12 @@ func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channe
 		Client:    client,
 		Msg:       msg,
 		Args:      fields[1:],
-		Config:    cfg,
-		Channels:  channels,
-		Links:     links,
-		Helpers:   helpers,
-		Reminders: reminders,
+		Config:    d.Config,
+		Channels:  d.Channels,
+		Links:     d.Links,
+		Helpers:   d.Helpers,
+		Reminders: d.Reminders,
+		Cats:      d.Cats,
 	}
 
 	switch cmd.Access {
@@ -118,6 +129,8 @@ func Handle(client *utils.Client, msg *utils.Message, cfg *config.Config, channe
 }
 
 func commandText(text string, cfg *config.Config) (string, bool) {
+	text = strings.TrimSpace(strings.ReplaceAll(text, "\U000e0000", ""))
+
 	if strings.HasPrefix(text, cfg.Prefix) {
 		return strings.TrimPrefix(text, cfg.Prefix), true
 	}
