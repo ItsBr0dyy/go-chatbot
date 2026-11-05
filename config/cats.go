@@ -172,3 +172,20 @@ func (s *CatStore) Transfer(fromID, fromLogin, toID, toLogin string, n int64) (i
 	}
 	return left, nil
 }
+
+func (s *CatStore) Settle(userID, login string, bet, payout int64) (int64, error) {
+	ctx, cancel := queryCtx()
+	defer cancel()
+
+	var balance int64
+	err := s.pool.QueryRow(ctx, `
+		UPDATE cats
+		SET amount = amount - $2 + $3, login = $4, updated_at = now()
+		WHERE user_id = $1 AND amount >= $2
+		RETURNING amount`,
+		userID, bet, payout, strings.ToLower(login)).Scan(&balance)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return 0, ErrNotEnoughCats
+	}
+	return balance, err
+}
