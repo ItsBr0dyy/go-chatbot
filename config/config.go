@@ -16,6 +16,7 @@ type Config struct {
 	Owners     []string `json:"owners"`
 	Prefix     string   `json:"prefix"`
 	LastFMKey  string   `json:"lastfm_api_key"`
+	STVUserID  string   `json:"stv_user_id"`
 	STVToken   string   `json:"stv_token"`
 	SongEmote  string   `json:"song_emote"`
 	ShortAPI   string   `json:"short_api"`
