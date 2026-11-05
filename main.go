@@ -12,6 +12,7 @@ import (
 	"github.com/itsbr0dyy/go-chatbot/commands"
 	"github.com/itsbr0dyy/go-chatbot/config"
 	"github.com/itsbr0dyy/go-chatbot/db"
+	"github.com/itsbr0dyy/go-chatbot/misc/loop"
 	"github.com/itsbr0dyy/go-chatbot/utils"
 )
 
@@ -25,6 +26,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	loop.StartEditorAccepter(cfg)
 
 	pool, err := db.Connect(context.Background(), cfg.DatabaseURL())
 	if err != nil {
