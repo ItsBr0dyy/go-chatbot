@@ -111,7 +111,7 @@ func botSTV(ctx *Context, c *stv.Client) (string, error) {
 }
 
 func canEdit(ctx *Context, c *stv.Client, editors []string) (bool, error) {
-	if strings.EqualFold(ctx.Msg.User, ctx.Msg.Channel) || ctx.IsOwner() {
+	if strings.EqualFold(ctx.Msg.User, ctx.Msg.Channel) || ctx.MyStatus() >= StatusMod {
 		return true, nil
 	}
 	id, err := c.UserIDFromTwitch(ctx.Msg.UserID())
@@ -143,7 +143,7 @@ func stvOwner(ctx *Context, c *stv.Client, verb, emote string) (*stv.UserSet, st
 		return nil, stvError(err, verb, emote)
 	}
 	if !allowed {
-		return nil, fmt.Sprintf("You must be an editor to %s emotes.", verb)
+		return nil, fmt.Sprintf("You must be a channel mod or 7TV editor to %s emotes.", verb)
 	}
 	return owner, ""
 }

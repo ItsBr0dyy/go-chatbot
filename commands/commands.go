@@ -32,6 +32,7 @@ type Deps struct {
 	Channels  *config.Channels
 	Links     *config.Links
 	Helpers   *config.Helpers
+	Mods      *config.Mods
 	Reminders *config.Reminders
 	Cats      *config.CatStore
 }
@@ -45,6 +46,7 @@ type Context struct {
 	Channels  *config.Channels
 	Links     *config.Links
 	Helpers   *config.Helpers
+	Mods      *config.Mods
 	Reminders *config.Reminders
 	Cats      *config.CatStore
 }
@@ -113,6 +115,7 @@ func Handle(client *utils.Client, msg *utils.Message, d *Deps) {
 		Channels:  d.Channels,
 		Links:     d.Links,
 		Helpers:   d.Helpers,
+		Mods:      d.Mods,
 		Reminders: d.Reminders,
 		Cats:      d.Cats,
 	}
