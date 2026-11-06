@@ -45,6 +45,11 @@ func main() {
 		log.Fatalf("loading helpers: %v", err)
 	}
 
+	mods, err := config.LoadMods(pool)
+	if err != nil {
+		log.Fatalf("loading mods: %v", err)
+	}
+
 	reminders, err := config.LoadReminders(pool)
 	if err != nil {
 		log.Fatalf("loading reminders: %v", err)
@@ -55,6 +60,7 @@ func main() {
 		Channels:  channels,
 		Links:     config.LoadLinks(pool),
 		Helpers:   helpers,
+		Mods:      mods,
 		Reminders: reminders,
 		Cats:      config.LoadCats(pool),
 	}
