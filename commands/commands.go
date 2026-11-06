@@ -40,6 +40,7 @@ type Context struct {
 	Client    *utils.Client
 	Msg       *utils.Message
 	Args      []string
+	Rest      string
 	Config    *config.Config
 	Channels  *config.Channels
 	Links     *config.Links
@@ -101,10 +102,13 @@ func Handle(client *utils.Client, msg *utils.Message, d *Deps) {
 		return
 	}
 
+	rest := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(body), fields[0]))
+
 	ctx := &Context{
 		Client:    client,
 		Msg:       msg,
 		Args:      fields[1:],
+		Rest:      rest,
 		Config:    d.Config,
 		Channels:  d.Channels,
 		Links:     d.Links,

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 )
 
 const gqlURL = "https://7tv.io/v4/gql"
@@ -353,4 +354,181 @@ mutation AcceptEditor {
 }`, userID, requesterID)
 
 	return c.do(query, map[string]any{}, nil)
+}
+
+func isNotFound(err error) bool {
+	var ge *GQLError
+	return errors.As(err, &ge) && strings.Contains(strings.ToLower(ge.Message), "not found")
+}
+
+type Profile struct {
+	ID        string
+	Roles     []string
+	PaintID   string
+	PaintName string
+	BadgeID   string
+	BadgeName string
+	Editors   int
+	CreatedAt time.Time
+}
+
+func (c *Client) UserProfile(twitchID string) (*Profile, error) {
+	const query = `
+query GetProfile($platformId: String!) {
+  users {
+    userByConnection(platform: TWITCH, platformId: $platformId) {
+      id
+      roles {
+        name
+      }
+      style {
+        activeBadge {
+          name
+          id
+        }
+        activePaint {
+          id
+          name
+        }
+      }
+      editors {
+        userId
+      }
+      createdAt
+    }
+  }
+}`
+
+	var out struct {
+		Users struct {
+			UserByConnection *struct {
+				ID    string `json:"id"`
+				Roles []struct {
+					Name string `json:"name"`
+				} `json:"roles"`
+				Style struct {
+					ActiveBadge *struct {
+						ID   string `json:"id"`
+						Name string `json:"name"`
+					} `json:"activeBadge"`
+					ActivePaint *struct {
+						ID   string `json:"id"`
+						Name string `json:"name"`
+					} `json:"activePaint"`
+				} `json:"style"`
+				Editors []struct {
+					UserID string `json:"userId"`
+				} `json:"editors"`
+				CreatedAt string `json:"createdAt"`
+			} `json:"userByConnection"`
+		} `json:"users"`
+	}
+	if err := c.do(query, map[string]any{"platformId": twitchID}, &out); err != nil {
+		if isNotFound(err) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	u := out.Users.UserByConnection
+	if u == nil {
+		return nil, ErrUserNotFound
+	}
+
+	p := &Profile{ID: u.ID, Editors: len(u.Editors)}
+	for _, r := range u.Roles {
+		p.Roles = append(p.Roles, r.Name)
+	}
+	if b := u.Style.ActiveBadge; b != nil {
+		p.BadgeID, p.BadgeName = b.ID, b.Name
+	}
+	if pt := u.Style.ActivePaint; pt != nil {
+		p.PaintID, p.PaintName = pt.ID, pt.Name
+	}
+	p.CreatedAt, _ = time.Parse(time.RFC3339, u.CreatedAt)
+	return p, nil
+}
+
+type Subscription struct {
+	TotalDays int
+	End       time.Time
+	AutoRenew bool
+	GiftedBy  string
+	Active    bool
+}
+
+func (c *Client) UserSubscription(twitchID string) (*Subscription, error) {
+	const query = `
+query GetSubscription($platformId: String!) {
+  users {
+    userByConnection(platform: TWITCH, platformId: $platformId) {
+      billing(productId: "01FEVKBBTGRAT7FCY276TNTJ4A") {
+        subscriptionInfo {
+          endDate
+          totalDays
+          activePeriod {
+            end
+            giftedBy {
+              id
+            }
+            isTrial
+            giftedById
+            id
+            autoRenew
+          }
+        }
+        badgeProgress {
+          currentBadgeId
+        }
+      }
+    }
+  }
+}`
+
+	var out struct {
+		Users struct {
+			UserByConnection *struct {
+				Billing *struct {
+					SubscriptionInfo *struct {
+						TotalDays    int `json:"totalDays"`
+						ActivePeriod *struct {
+							End      string `json:"end"`
+							GiftedBy *struct {
+								ID string `json:"id"`
+							} `json:"giftedBy"`
+							GiftedByID string `json:"giftedById"`
+							AutoRenew  bool   `json:"autoRenew"`
+						} `json:"activePeriod"`
+					} `json:"subscriptionInfo"`
+				} `json:"billing"`
+			} `json:"userByConnection"`
+		} `json:"users"`
+	}
+	if err := c.do(query, map[string]any{"platformId": twitchID}, &out); err != nil {
+		if isNotFound(err) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	u := out.Users.UserByConnection
+	if u == nil {
+		return nil, ErrUserNotFound
+	}
+	if u.Billing == nil || u.Billing.SubscriptionInfo == nil {
+		return nil, nil
+	}
+
+	info := u.Billing.SubscriptionInfo
+	sub := &Subscription{TotalDays: info.TotalDays}
+	if p := info.ActivePeriod; p != nil {
+		sub.Active = true
+		sub.AutoRenew = p.AutoRenew
+		sub.End, _ = time.Parse(time.RFC3339, p.End)
+		sub.GiftedBy = p.GiftedByID
+		if sub.GiftedBy == "" && p.GiftedBy != nil {
+			sub.GiftedBy = p.GiftedBy.ID
+		}
+	}
+	return sub, nil
 }

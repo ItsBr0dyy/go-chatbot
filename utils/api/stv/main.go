@@ -80,3 +80,27 @@ func (c *Client) ChannelEmotes(stvUserID string) ([]ChannelEmote, error) {
 func UserIDFromTwitch(twitchID string) (string, error) {
 	return New("").UserIDFromTwitch(twitchID)
 }
+
+func (c *Client) DisplayNameV3(userID string) (string, error) {
+	resp, err := httpClient.Get("https://7tv.io/v3/users/" + url.PathEscape(userID))
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("7tv returned %d", resp.StatusCode)
+	}
+
+	var data struct {
+		Username    string `json:"username"`
+		DisplayName string `json:"display_name"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return "", err
+	}
+	if data.DisplayName != "" {
+		return data.DisplayName, nil
+	}
+	return data.Username, nil
+}
