@@ -62,6 +62,20 @@ CREATE TABLE IF NOT EXISTS cats (
 
 CREATE INDEX IF NOT EXISTS cats_amount_idx ON cats (amount DESC);
 CREATE INDEX IF NOT EXISTS cats_login_idx ON cats (login);
+
+CREATE TABLE IF NOT EXISTS bot_mods (
+	login  TEXT PRIMARY KEY,
+	set_by TEXT NOT NULL,
+	set_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS channel_mods (
+	channel TEXT NOT NULL,
+	login   TEXT NOT NULL,
+	set_by  TEXT NOT NULL,
+	set_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+	PRIMARY KEY (channel, login)
+);
 `
 
 func Connect(ctx context.Context, url string) (*pgxpool.Pool, error) {
