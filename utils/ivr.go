@@ -90,3 +90,60 @@ func IVRUser(login string) (*TwitchUser, error) {
 	}
 	return &users[0], nil
 }
+
+type StreamInfo struct {
+	Title     string
+	Game      string
+	Viewers   int
+	StartedAt time.Time
+}
+
+func (u *TwitchUser) LiveStream() *StreamInfo {
+	if !u.IsLive() {
+		return nil
+	}
+
+	var raw struct {
+		Title        string          `json:"title"`
+		ViewersCount int             `json:"viewersCount"`
+		Viewers      int             `json:"viewers"`
+		CreatedAt    string          `json:"createdAt"`
+		StartedAt    string          `json:"startedAt"`
+		Game         json.RawMessage `json:"game"`
+	}
+	info := &StreamInfo{}
+	if err := json.Unmarshal(u.Stream, &raw); err != nil {
+		return info
+	}
+
+	info.Title = raw.Title
+	info.Viewers = raw.ViewersCount
+	if info.Viewers == 0 {
+		info.Viewers = raw.Viewers
+	}
+
+	for _, s := range []string{raw.CreatedAt, raw.StartedAt} {
+		if t, err := time.Parse(time.RFC3339, s); err == nil {
+			info.StartedAt = t
+			break
+		}
+	}
+
+	if len(raw.Game) > 0 {
+		var obj struct {
+			DisplayName string `json:"displayName"`
+			Name        string `json:"name"`
+		}
+		var s string
+		switch {
+		case json.Unmarshal(raw.Game, &obj) == nil && (obj.DisplayName != "" || obj.Name != ""):
+			info.Game = obj.DisplayName
+			if info.Game == "" {
+				info.Game = obj.Name
+			}
+		case json.Unmarshal(raw.Game, &s) == nil:
+			info.Game = s
+		}
+	}
+	return info
+}
