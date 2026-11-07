@@ -10,22 +10,23 @@ import (
 )
 
 type Config struct {
-	Username   string   `json:"username"`
-	OAuth      string   `json:"oauth"`
-	Helpers    []string `json:"helpers"`
-	Owners     []string `json:"owners"`
-	Prefix     string   `json:"prefix"`
-	LastFMKey  string   `json:"lastfm_api_key"`
-	STVUserID  string   `json:"stv_user_id"`
-	STVToken   string   `json:"stv_token"`
-	SongEmote  string   `json:"song_emote"`
-	ShortAPI   string   `json:"short_api"`
-	PasteAPI   string   `json:"paste_api"`
-	DBHost     string   `json:"db_host"`
-	DBPort     string   `json:"db_port"`
-	DBUser     string   `json:"db_user"`
-	DBPassword string   `json:"db_password"`
-	DBName     string   `json:"db_name"`
+	Username       string   `json:"username"`
+	OAuth          string   `json:"oauth"`
+	Helpers        []string `json:"helpers"`
+	Owners         []string `json:"owners"`
+	Prefix         string   `json:"prefix"`
+	LastFMKey      string   `json:"lastfm_api_key"`
+	STVUserID      string   `json:"stv_user_id"`
+	STVToken       string   `json:"stv_token"`
+	SongEmote      string   `json:"song_emote"`
+	ShortAPI       string   `json:"short_api"`
+	PasteAPI       string   `json:"paste_api"`
+	DBHost         string   `json:"db_host"`
+	DBPort         string   `json:"db_port"`
+	DBUser         string   `json:"db_user"`
+	DBPassword     string   `json:"db_password"`
+	DBName         string   `json:"db_name"`
+	StartupChannel string   `json:"startup_channel"`
 }
 
 func Load(path string) (*Config, error) {
@@ -65,6 +66,9 @@ func Load(path string) (*Config, error) {
 	}
 	if cfg.PasteAPI == "" {
 		cfg.PasteAPI = "https://itsbr0dyy.dev/api/haste"
+	}
+	if cfg.StartupChannel == "" {
+		cfg.StartupChannel = "itsbr0dyy"
 	}
 	return &cfg, nil
 }
