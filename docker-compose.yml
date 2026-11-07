@@ -18,13 +18,18 @@ services:
   bot:
     build: .
     restart: unless-stopped
+    user: "1000:1000"
+    working_dir: /app
     depends_on:
       db:
         condition: service_healthy
     environment:
+      HOME: /tmp
+      GOCACHE: /tmp/go-build
+      GOPATH: /tmp/go
       CONFIG_PATH: /app/config.json
     volumes:
-      - ./config.json:/app/config.json:ro
+      - ./:/app
 
 volumes:
   pgdata:

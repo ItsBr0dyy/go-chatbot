@@ -1,14 +1,5 @@
-FROM golang:1.25-alpine AS build
+FROM golang:1.25-alpine
+RUN apk add --no-cache git ca-certificates tzdata
 ENV GOTOOLCHAIN=auto
-WORKDIR /src
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 go build -o /bot .
-
-FROM alpine:3.20
-RUN apk add --no-cache ca-certificates tzdata
 WORKDIR /app
-COPY --from=build /bot /usr/local/bin/bot
-USER nobody
-CMD ["bot"]
+CMD ["sh", "-c", "go build -o /tmp/bot . && exec /tmp/bot"]
