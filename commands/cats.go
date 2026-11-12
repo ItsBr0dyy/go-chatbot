@@ -100,6 +100,7 @@ func init() {
 	})
 	Register(&Command{
 		Name:     "leaderboard",
+		Aliases:  []string{"lb"},
 		Category: "Cats",
 		Usage:    "leaderboard",
 		Desc:     "Shows the top cat owners.",
